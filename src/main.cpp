@@ -121,7 +121,6 @@ void setup() {
   if(qmc5883lSuccess){
     qmc5883l.calibrate(QMC5883L_CALIBRATION_TIME);
   }
-
 }
 
 void loop() {
@@ -189,7 +188,7 @@ void loop() {
   float distance = targetDistance(myLocation, target);
 
   // Display on OLED
-  updateCompass(azimuth, heading, ssd1306);
+  updateCompass(azimuth, heading, distance, ssd1306);
 
   delay(200);
 }
