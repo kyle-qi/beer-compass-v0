@@ -1,7 +1,6 @@
 #ifndef QMC5883L_H
 #define QMC5883L_H
 
-#include <Arduino.h>
 #include "config/qmc5883l_defs.h"
 
 class QMC5883L{

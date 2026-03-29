@@ -1,7 +1,6 @@
 #ifndef MPU6500_H
 #define MPU6500_H
 
-#include <Arduino.h>
 #include "config/mpu6500_defs.h"
 
 class MPU6500{
@@ -457,7 +456,7 @@ class MPU6500{
      */
     float lsbResGyro;
 
-    /** Selects scaling in @ref readSensor (gyro rad/s, accel m/s², temp raw). */
+    /** Selects scaling in @ref readSensor (gyro rad/s, accel m/s^2, temp raw). */
     enum class SensorChannel : uint8_t {
         Gyro = 0,
         Accel = 1,

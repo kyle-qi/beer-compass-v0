@@ -1,29 +1,25 @@
 #ifndef I2C_HANDLER_H
 #define I2C_HANDLER_H
 
-#include <Arduino.h>
-
 namespace i2c_field {
-
-/** Replace @a mask bits in @a reg with corresponding bits from @a value (stray bits in @a value are masked off). */
-inline uint8_t merge_masked(uint8_t reg, uint8_t value, uint8_t mask) {
-  return static_cast<uint8_t>((reg & static_cast<uint8_t>(~mask)) | (value & mask));
-}
-
-/** Extract the field selected by @a mask, shifted so its LSB aligns with bit 0. */
-inline uint8_t read_shifted(uint8_t reg, uint8_t mask) {
-  if (mask == 0) {
-    return 0;
+  /** Replace @a mask bits in @a reg with corresponding bits from @a value (stray bits in @a value are masked off). */
+  inline uint8_t merge_masked(uint8_t reg, uint8_t value, uint8_t mask) {
+    return static_cast<uint8_t>((reg & static_cast<uint8_t>(~mask)) | (value & mask));
   }
-  uint8_t m = mask;
-  uint8_t r = reg;
-  while ((m & 1u) == 0) {
-    m = static_cast<uint8_t>(m >> 1);
-    r = static_cast<uint8_t>(r >> 1);
-  }
-  return static_cast<uint8_t>(r & m);
-}
 
+  /** Extract the field selected by @a mask, shifted so its LSB aligns with bit 0. */
+  inline uint8_t read_shifted(uint8_t reg, uint8_t mask) {
+    if (mask == 0) {
+      return 0;
+    }
+    uint8_t m = mask;
+    uint8_t r = reg;
+    while ((m & 1u) == 0) {
+      m = static_cast<uint8_t>(m >> 1);
+      r = static_cast<uint8_t>(r >> 1);
+    }
+    return static_cast<uint8_t>(r & m);
+  }
 }  // namespace i2c_field
 
 /**

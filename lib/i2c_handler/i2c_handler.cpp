@@ -1,4 +1,5 @@
 #include "i2c_handler.h"
+#include <Arduino.h>
 #include <Wire.h>
 
 bool i2cScan(){
