@@ -1,6 +1,5 @@
 #include "mpu6500.h"
 #include "i2c_handler.h"
-#include "bit_ops.h"
 
 MPU6500::MPU6500(uint8_t myAddress) : address(myAddress) {}
 

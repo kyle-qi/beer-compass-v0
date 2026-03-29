@@ -1,6 +1,5 @@
 #include "qmc5883l.h"
 #include "i2c_handler.h"
-#include "bit_ops.h"
 
 QMC5883L::QMC5883L(uint8_t myAddress) : address(myAddress) {}
 
@@ -8,13 +7,13 @@ bool QMC5883L::setMode(Mode mode){
     uint8_t config = i2cRead(this->address, QMC5883L_CTRLA_REG);
 
     // Early return if mode is already set properly
-    if(readBits(config, 0b11) == static_cast<uint8_t>(mode)){
+    if (i2c_field::read_shifted(config, 0b11) == static_cast<uint8_t>(mode)) {
         return true;
     }
 
     // Mode must be set to suspend between different modes
-    if (readBits(config, 0b11) != 0b00){
-        config = writeBits(config, 0b00, 0b11);
+    if (i2c_field::read_shifted(config, 0b11) != 0b00) {
+        config = i2c_field::merge_masked(config, 0b00, 0b11);
         if (!i2cWrite(this->address, QMC5883L_CTRLA_REG, config)){
             return false;
         }
@@ -22,7 +21,7 @@ bool QMC5883L::setMode(Mode mode){
     }
 
     // Write to registers
-    config = writeBits(config, static_cast<uint8_t>(mode), 0b11);
+    config = i2c_field::merge_masked(config, static_cast<uint8_t>(mode), 0b11);
     return i2cWrite(this->address, QMC5883L_CTRLA_REG, config);
 }
     
