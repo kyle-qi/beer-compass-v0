@@ -3,6 +3,48 @@
 
 #include <Arduino.h>
 
+/** I2C address with ADDR pin low (override before including this header if needed). */
+#ifndef QMC5883L_I2C_ADDR_PIN_LOW
+#define QMC5883L_I2C_ADDR_PIN_LOW 0x2C
+#endif
+
+/** @name setOutputRate — valid ODR (Hz) */
+/// @{
+#define QMC5883L_OUTPUT_ODR_10_HZ  10
+#define QMC5883L_OUTPUT_ODR_50_HZ  50
+#define QMC5883L_OUTPUT_ODR_100_HZ 100
+#define QMC5883L_OUTPUT_ODR_200_HZ 200
+/// @}
+
+/** @name setOverSampleRate — valid ratios */
+/// @{
+#define QMC5883L_OVERSAMPLE_RATE_1 1
+#define QMC5883L_OVERSAMPLE_RATE_2 2
+#define QMC5883L_OVERSAMPLE_RATE_4 4
+#define QMC5883L_OVERSAMPLE_RATE_8 8
+/// @}
+
+/** @name setDownSampleRate — valid ratios */
+/// @{
+#define QMC5883L_DOWNSAMPLE_RATE_1 1
+#define QMC5883L_DOWNSAMPLE_RATE_2 2
+#define QMC5883L_DOWNSAMPLE_RATE_4 4
+#define QMC5883L_DOWNSAMPLE_RATE_8 8
+/// @}
+
+/** @name setRange — full scale (Gauss) */
+/// @{
+#define QMC5883L_RANGE_2_GAUSS  2
+#define QMC5883L_RANGE_8_GAUSS  8
+#define QMC5883L_RANGE_12_GAUSS 12
+#define QMC5883L_RANGE_30_GAUSS 30
+/// @}
+
+/** Default idle time (ms) with no min/max update before @ref calibrate ends. */
+#ifndef QMC5883L_CALIBRATION_IDLE_MS_DEFAULT
+#define QMC5883L_CALIBRATION_IDLE_MS_DEFAULT 5000
+#endif
+
 // Magnetometer registers
 #define XLSB_REG 0x01
 #define XMSB_REG 0x02
@@ -24,10 +66,10 @@ class QMC5883L{
 
     /**
      * @brief Class constructor.
-     * 
-     * @param myAddress The I2C address of the object.
+     *
+     * @param myAddress The I2C address of the object (default @ref QMC5883L_I2C_ADDR_PIN_LOW).
      */
-    QMC5883L(uint8_t myAddress);
+    explicit QMC5883L(uint8_t myAddress = QMC5883L_I2C_ADDR_PIN_LOW);
 
     /**
      * @brief typedef defining the modes for the setMode function
@@ -50,34 +92,34 @@ class QMC5883L{
     /**
      * @brief Sets the magnetometer's data output frequency.
      * 
-     * @param odr Output data rate in Hz. Valid values: 10, 50, 100, 200. Default value is 10.
+     * @param odr Output data rate in Hz. Use @c QMC5883L_OUTPUT_ODR_* macros. Default: @ref QMC5883L_OUTPUT_ODR_10_HZ.
      * @return true if the configuration is successful, false otherwise.
      */
-    bool setOutputRate(uint8_t odr = 10);
+    bool setOutputRate(uint8_t odr = QMC5883L_OUTPUT_ODR_10_HZ);
 
     /**
      * @brief Sets the magnetometer's over sample rate ratio
      * 
-     * @param osr1 Over sample rate ratio. Valid values: 1, 2, 4, 8. Default value is 2.
+     * @param osr1 Over sample rate ratio. Use @c QMC5883L_OVERSAMPLE_RATE_* macros. Default: @ref QMC5883L_OVERSAMPLE_RATE_2.
      * @return true if the configuration is successful, false otherwise.
      */
-    bool setOverSampleRate(uint8_t osr1 = 2);
+    bool setOverSampleRate(uint8_t osr1 = QMC5883L_OVERSAMPLE_RATE_2);
     
     /**
      * @brief Sets the magnetometer's down sample rate ratio.
      * 
-     * @param osr2 Down sample rate ratio. Valid values: 1, 2, 4, 8. Default value is 4.
+     * @param osr2 Down sample rate ratio. Use @c QMC5883L_DOWNSAMPLE_RATE_* macros. Default: @ref QMC5883L_DOWNSAMPLE_RATE_4.
      * @return true if the configuration is successful, false otherwise.
      */
-    bool setDownSampleRate(uint8_t osr2 = 4);
+    bool setDownSampleRate(uint8_t osr2 = QMC5883L_DOWNSAMPLE_RATE_4);
 
     /**
      * @brief Sets the magnetometer's magnetic range.
      * 
-     * @param rng Magnetic range in Gauss. Valid values: 2, 8, 12, 30. Default value is 2.
+     * @param rng Magnetic range in Gauss. Use @c QMC5883L_RANGE_*_GAUSS macros. Default: @ref QMC5883L_RANGE_2_GAUSS.
      * @return true if the configuration is successful, false otherwise.
      */
-    bool setRange(uint8_t range = 2);
+    bool setRange(uint8_t range = QMC5883L_RANGE_2_GAUSS);
 
     /**
      * @brief typedef defining the modes for the setResetMode function
@@ -103,6 +145,16 @@ class QMC5883L{
      */
     bool resetRegisters();
 
+    /**
+     * @brief Continuous heading profile: reset, continuous mode, ODR/oversample/downsample/range from library macros.
+     *
+     * Uses @ref QMC5883L_OUTPUT_ODR_10_HZ, @ref QMC5883L_OVERSAMPLE_RATE_8, @ref QMC5883L_DOWNSAMPLE_RATE_8,
+     * @ref QMC5883L_RANGE_8_GAUSS, and SetResetMode @c SET_ON.
+     *
+     * @return true if every step succeeded.
+     */
+    bool configureDefaults();
+
     /** 
      * @brief Tells you if the magnetometer has data ready.
      * 
@@ -120,9 +172,9 @@ class QMC5883L{
     /** 
      * @brief Determines and stores the maximum and minimum readings in the X, Y, and Z directions.
      * 
-     * @param calibrationTime Duration of no-change before ending calibration in ms.
+     * @param calibrationTime Duration of no-change before ending calibration in ms (default @ref QMC5883L_CALIBRATION_IDLE_MS_DEFAULT).
      */
-    void calibrate(int calibrationTime);
+    void calibrate(int calibrationTime = QMC5883L_CALIBRATION_IDLE_MS_DEFAULT);
 
     /**
      * @brief Manually set magnetometer's maximum/minimum readings for calibration.

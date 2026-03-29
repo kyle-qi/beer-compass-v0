@@ -30,10 +30,10 @@ bool QMC5883L::setOutputRate(uint8_t odr){
     // Set bits based on mode selected
     uint8_t bits;
     switch(odr){
-        case 10: bits = 0b00; break;
-        case 50: bits = 0b01; break;
-        case 100: bits = 0b10; break;
-        case 200: bits = 0b11; break;
+        case QMC5883L_OUTPUT_ODR_10_HZ:  bits = 0b00; break;
+        case QMC5883L_OUTPUT_ODR_50_HZ:  bits = 0b01; break;
+        case QMC5883L_OUTPUT_ODR_100_HZ: bits = 0b10; break;
+        case QMC5883L_OUTPUT_ODR_200_HZ: bits = 0b11; break;
         default: return false;
     }
     bits <<= 2;
@@ -46,10 +46,10 @@ bool QMC5883L::setOverSampleRate(uint8_t osr1){
     // Set bits based on mode selected
     uint8_t bits;
     switch(osr1){
-        case 8: bits = 0b00; break;
-        case 4: bits = 0b01; break;
-        case 2: bits = 0b10; break;
-        case 1: bits = 0b11; break;
+        case QMC5883L_OVERSAMPLE_RATE_8: bits = 0b00; break;
+        case QMC5883L_OVERSAMPLE_RATE_4: bits = 0b01; break;
+        case QMC5883L_OVERSAMPLE_RATE_2: bits = 0b10; break;
+        case QMC5883L_OVERSAMPLE_RATE_1: bits = 0b11; break;
         default: return false;
     }
     bits <<= 4;
@@ -62,10 +62,10 @@ bool QMC5883L::setDownSampleRate(uint8_t osr2){
     // Set bits based on mode selected
     uint8_t bits;
     switch(osr2){
-        case 1: bits = 0b00; break;
-        case 2: bits = 0b01; break;
-        case 4: bits = 0b10; break;
-        case 8: bits = 0b11; break;
+        case QMC5883L_DOWNSAMPLE_RATE_1: bits = 0b00; break;
+        case QMC5883L_DOWNSAMPLE_RATE_2: bits = 0b01; break;
+        case QMC5883L_DOWNSAMPLE_RATE_4: bits = 0b10; break;
+        case QMC5883L_DOWNSAMPLE_RATE_8: bits = 0b11; break;
         default: return false;
     }
     bits <<= 6;
@@ -78,10 +78,10 @@ bool QMC5883L::setRange(uint8_t range){
     // Set bits based on mode selected
     uint8_t bits;
     switch(range){
-        case 30: bits = 0b00; break;
-        case 12: bits = 0b01; break;
-        case 8: bits = 0b10; break;
-        case 2: bits = 0b11; break;
+        case QMC5883L_RANGE_30_GAUSS: bits = 0b00; break;
+        case QMC5883L_RANGE_12_GAUSS: bits = 0b01; break;
+        case QMC5883L_RANGE_8_GAUSS:  bits = 0b10; break;
+        case QMC5883L_RANGE_2_GAUSS:  bits = 0b11; break;
         default: return false;
     }
     bits <<= 2;
@@ -104,6 +104,18 @@ bool QMC5883L::resetRegisters(){
         return false;
     }
     return true;
+}
+
+bool QMC5883L::configureDefaults(){
+    bool ok = true;
+    ok &= resetRegisters();
+    ok &= setMode(MODE_CONTINUOUS);
+    ok &= setOutputRate(QMC5883L_OUTPUT_ODR_10_HZ);
+    ok &= setOverSampleRate(QMC5883L_OVERSAMPLE_RATE_8);
+    ok &= setDownSampleRate(QMC5883L_DOWNSAMPLE_RATE_8);
+    ok &= setSetResetMode(SET_ON);
+    ok &= setRange(QMC5883L_RANGE_8_GAUSS);
+    return ok;
 }
 
 bool QMC5883L::isDRDY(){

@@ -8,15 +8,77 @@
 #define GRAVITY 9.10665
 #endif
 
+/** I2C address with AD0 low (override before including this header if needed). */
+#ifndef MPU6500_I2C_ADDR_AD0_LOW
+#define MPU6500_I2C_ADDR_AD0_LOW 0x68
+#endif
+
+/** @name setSampleRateDivider — example values (register SMPLRT_DIV; internal rate 1 kHz → ~100 Hz data) */
+/// @{
+#define MPU6500_SMPLRT_DIV_9 9
+/// @}
+
+/** @name setFIFOMode — @c stopWhenFull argument */
+/// @{
+#define MPU6500_FIFO_OVERWRITE_OLDEST false
+#define MPU6500_FIFO_STOP_WHEN_FULL   true
+/// @}
+
+/** @name setAccelLPF — valid bandwidth (Hz) when LPF is on */
+/// @{
+#define MPU6500_ACCEL_DLPF_BW_460_HZ 460
+#define MPU6500_ACCEL_DLPF_BW_184_HZ 184
+#define MPU6500_ACCEL_DLPF_BW_92_HZ  92
+#define MPU6500_ACCEL_DLPF_BW_44_HZ  44
+#define MPU6500_ACCEL_DLPF_BW_41_HZ  41
+#define MPU6500_ACCEL_DLPF_BW_20_HZ  20
+#define MPU6500_ACCEL_DLPF_BW_10_HZ  10
+#define MPU6500_ACCEL_DLPF_BW_5_HZ   5
+/// @}
+
+/** @name setAccelRange — full scale (g) */
+/// @{
+#define MPU6500_ACCEL_FS_2G  2
+#define MPU6500_ACCEL_FS_4G  4
+#define MPU6500_ACCEL_FS_8G  8
+#define MPU6500_ACCEL_FS_16G 16
+/// @}
+
+/** @name setGyroRange — full scale (dps) */
+/// @{
+#define MPU6500_GYRO_FS_250DPS  250
+#define MPU6500_GYRO_FS_500DPS  500
+#define MPU6500_GYRO_FS_1000DPS 1000
+#define MPU6500_GYRO_FS_2000DPS 2000
+/// @}
+
+/** @name setGyroLPF — valid bandwidth (Hz) when LPF is on */
+/// @{
+#define MPU6500_GYRO_DLPF_BW_250_HZ  250
+#define MPU6500_GYRO_DLPF_BW_184_HZ  184
+#define MPU6500_GYRO_DLPF_BW_92_HZ   92
+#define MPU6500_GYRO_DLPF_BW_41_HZ   41
+#define MPU6500_GYRO_DLPF_BW_20_HZ   20
+#define MPU6500_GYRO_DLPF_BW_10_HZ   10
+#define MPU6500_GYRO_DLPF_BW_5_HZ    5
+#define MPU6500_GYRO_DLPF_BW_3600_HZ 3600
+/// @}
+
+/** @name enableGyro, enableTempSense, LPF enables — @c isEnable / @c isOn arguments */
+/// @{
+#define MPU6500_SENSOR_ENABLE  true
+#define MPU6500_SENSOR_DISABLE false
+/// @}
+
 class MPU6500{
     public:
 
     /**
      * @brief Class constructor.
-     * 
-     * @param myAddress The I2C address of the object.
+     *
+     * @param myAddress The I2C address of the object (default @ref MPU6500_I2C_ADDR_AD0_LOW).
      */
-    MPU6500(uint8_t myAddress);
+    explicit MPU6500(uint8_t myAddress = MPU6500_I2C_ADDR_AD0_LOW);
 
     /**
      * @brief Set the gyroscope's reading offsets.
@@ -46,10 +108,10 @@ class MPU6500{
      * additional writes will be written to the FIFO, replacing the
      * oldest data.
      * 
-     * @param mode The desired FIFO mode.
+     * @param stopWhenFull Use @ref MPU6500_FIFO_STOP_WHEN_FULL or @ref MPU6500_FIFO_OVERWRITE_OLDEST. Default: @ref MPU6500_FIFO_STOP_WHEN_FULL.
      * @return true if the operation is successful, false otherwise.
      */
-    bool setFIFOMode(bool stopWhenFull = 1);
+    bool setFIFOMode(bool stopWhenFull = MPU6500_FIFO_STOP_WHEN_FULL);
 
     /**
      * @brief typedef defining the external sync sources for setFSync
@@ -72,11 +134,11 @@ class MPU6500{
     /**
      * @brief Sets the gyroscope and temperature sensor LPF.
      * 
-     * @param isOn true to enable the LPF, false to disable it.
-     * @param bandwidth The bandwidth of the LPF. Valid values: 5, 10, 20, 41, 92, 184, 250, 3600 (Hz). Default value: 250.
+     * @param isOn Use @ref MPU6500_SENSOR_ENABLE or @ref MPU6500_SENSOR_DISABLE.
+     * @param bandwidth Use @c MPU6500_GYRO_DLPF_BW_* macros (Hz). Default: @ref MPU6500_GYRO_DLPF_BW_250_HZ.
      * @return true if the configuration is successful, false otherwise.
      */
-    bool setGyroLPF(bool isOn = 1, uint16_t bandwidth = 250);
+    bool setGyroLPF(bool isOn = MPU6500_SENSOR_ENABLE, uint16_t bandwidth = MPU6500_GYRO_DLPF_BW_250_HZ);
 
     /**
      * @brief Enables/disables the gyroscope and temperature sensor LPF.
@@ -85,26 +147,26 @@ class MPU6500{
      * @param inOn true to enable the LPF, false to disable it.
      * @return true if the configuration is successful, false otherwise.
      */
-    bool gyroLPFEnable(bool isOn = 1);
+    bool gyroLPFEnable(bool isOn = MPU6500_SENSOR_ENABLE);
 
     // TODO: choose sensible default parameter value.
     /**
      * @brief Set the gyro full scale range.
      * 
-     * @param range The desired range. Valid values: 250, 500, 1000, 200 (dps). Default value: 250.
+     * @param range Use @c MPU6500_GYRO_FS_*DPS macros. Default: @ref MPU6500_GYRO_FS_250DPS.
      * @return true if configuration is successful, false otherwise.
      */
-    bool setGyroRange(uint16_t range = 250);
+    bool setGyroRange(uint16_t range = MPU6500_GYRO_FS_250DPS);
 
     // TODO: choose sensible default parameter value.
     /**
      * @brief Sets the accelerometer LPF.
      * 
-     * @param isON true to enable the LPF, false to disable it.
-     * @param bandwidth the bandwidth of the LPF. Valid values: 5, 10, 20, 41, 92, 184, 860 (Hz). Default value: 460.
+     * @param isOn Use @ref MPU6500_SENSOR_ENABLE or @ref MPU6500_SENSOR_DISABLE.
+     * @param bandwidth Use @c MPU6500_ACCEL_DLPF_BW_* macros (Hz). Default: @ref MPU6500_ACCEL_DLPF_BW_460_HZ.
      * @return true if the configuration is successful, false otherwise.
      */
-    bool setAccelLPF(bool isOn, uint16_t bandwidth = 460);
+    bool setAccelLPF(bool isOn, uint16_t bandwidth = MPU6500_ACCEL_DLPF_BW_460_HZ);
 
     /**
      * @brief Enables/disables the accelerometer LPF.
@@ -112,16 +174,16 @@ class MPU6500{
      * @param isOn true to enable the LPF, false to disable it.
      * @return true if the configuration is successful, false otherwise.
      */
-    bool accelLPFEnable(bool isOn = 1);
+    bool accelLPFEnable(bool isOn = MPU6500_SENSOR_ENABLE);
 
     // TODO: choose sensible default parameter value.
     /**
      * @brief Set the accelerometer full scale range.
      * 
-     * @param range The desired range. Valid values: 2, 4, 8, 16 (g). Default value: 2.
+     * @param range Use @c MPU6500_ACCEL_FS_*G macros. Default: @ref MPU6500_ACCEL_FS_2G.
      * @return true if the configuration is successful, false otherwise.
      */
-    bool setAccelRange(uint8_t range = 2);
+    bool setAccelRange(uint8_t range = MPU6500_ACCEL_FS_2G);
 
     /** 
      * @brief Tells you if the IC has data ready.
@@ -292,6 +354,16 @@ class MPU6500{
      * @return true if the operation is successful, false otherwise.
      */
     bool resetRegisters();
+
+    /**
+     * @brief Accel-only helper profile for tilt: reset, sample rate, FIFO overwrite, accel LPF/range, gyros and temp off.
+     *
+     * Uses @ref MPU6500_SMPLRT_DIV_9, @ref MPU6500_FIFO_OVERWRITE_OLDEST, @ref MPU6500_ACCEL_DLPF_BW_44_HZ,
+     * @ref MPU6500_ACCEL_FS_2G, @ref MPU6500_SENSOR_DISABLE for gyro and temp.
+     *
+     * @return true if every step succeeded.
+     */
+    bool configureDefaults();
 
     /**
      * @brief Sets the chip to sleep.

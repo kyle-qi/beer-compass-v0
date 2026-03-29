@@ -46,14 +46,14 @@ bool MPU6500::setGyroLPF(bool isOn, uint16_t bandwidth){
         // Set bits based on mode selected
         uint8_t bits;
         switch(bandwidth){
-            case 250: bits = 0; break;
-            case 184: bits = 1; break;
-            case 92: bits = 2; break;
-            case 41: bits = 3; break;
-            case 20: bits = 4; break;
-            case 10: bits = 5; break;
-            case 5: bits = 6; break;
-            case 3600: bits = 7; break;
+            case MPU6500_GYRO_DLPF_BW_250_HZ:  bits = 0; break;
+            case MPU6500_GYRO_DLPF_BW_184_HZ:  bits = 1; break;
+            case MPU6500_GYRO_DLPF_BW_92_HZ:   bits = 2; break;
+            case MPU6500_GYRO_DLPF_BW_41_HZ:   bits = 3; break;
+            case MPU6500_GYRO_DLPF_BW_20_HZ:   bits = 4; break;
+            case MPU6500_GYRO_DLPF_BW_10_HZ:   bits = 5; break;
+            case MPU6500_GYRO_DLPF_BW_5_HZ:    bits = 6; break;
+            case MPU6500_GYRO_DLPF_BW_3600_HZ: bits = 7; break;
             default: return false;
         }
 
@@ -78,10 +78,10 @@ bool MPU6500::setGyroRange(uint16_t range){
     // Set bits based on mode selected
     uint8_t bits;
     switch(range){
-        case 250: bits = 0b00; break;
-        case 500: bits = 0b01; break;
-        case 1000: bits = 0b10; break;
-        case 2000: bits = 0b11; break;
+        case MPU6500_GYRO_FS_250DPS:  bits = 0b00; break;
+        case MPU6500_GYRO_FS_500DPS:  bits = 0b01; break;
+        case MPU6500_GYRO_FS_1000DPS: bits = 0b10; break;
+        case MPU6500_GYRO_FS_2000DPS: bits = 0b11; break;
         default: return false;
     }
     bits <<= 3;
@@ -101,13 +101,13 @@ bool MPU6500::setAccelLPF(bool isOn, uint16_t bandwidth){
         // Set bits based on mode selected
         uint8_t bits;
         switch(bandwidth){
-            case 460: bits = 0; break;
-            case 184: bits = 1; break;
-            case 92: bits = 2; break;
-            case 41: bits = 3; break;
-            case 20: bits = 4; break;
-            case 10: bits = 5; break;
-            case 5: bits = 6; break;
+            case MPU6500_ACCEL_DLPF_BW_460_HZ: bits = 0; break;
+            case MPU6500_ACCEL_DLPF_BW_184_HZ: bits = 1; break;
+            case MPU6500_ACCEL_DLPF_BW_92_HZ:  bits = 2; break;
+            case MPU6500_ACCEL_DLPF_BW_44_HZ:  bits = 3; break;
+            case MPU6500_ACCEL_DLPF_BW_20_HZ:  bits = 4; break;
+            case MPU6500_ACCEL_DLPF_BW_10_HZ:  bits = 5; break;
+            case MPU6500_ACCEL_DLPF_BW_5_HZ:   bits = 6; break;
             default: return false;
         }
 
@@ -133,10 +133,10 @@ bool MPU6500::setAccelRange(uint8_t range){
     // Set bits based on mode selected
     uint8_t bits;
     switch(range){
-        case 2: bits = 0b00; break;
-        case 4: bits = 0b01; break;
-        case 8: bits = 0b10; break;
-        case 16: bits = 0b11; break;
+        case MPU6500_ACCEL_FS_2G:  bits = 0b00; break;
+        case MPU6500_ACCEL_FS_4G:  bits = 0b01; break;
+        case MPU6500_ACCEL_FS_8G:  bits = 0b10; break;
+        case MPU6500_ACCEL_FS_16G: bits = 0b11; break;
         default: return false;
     }
     bits <<= 3;
@@ -196,6 +196,19 @@ int16_t MPU6500::readTemp(){
 
 bool MPU6500::resetRegisters(){
     return i2cWrite(this->address, PWR_MGMT_1, 1, 0b10000000);
+}
+
+bool MPU6500::configureDefaults(){
+    bool ok = true;
+    ok &= resetRegisters();
+    ok &= setSampleRateDivider(MPU6500_SMPLRT_DIV_9);
+    ok &= setFIFOMode(MPU6500_FIFO_OVERWRITE_OLDEST);
+    ok &= setFSync(EXT_SOURCE_DISABLE);
+    ok &= setAccelLPF(MPU6500_SENSOR_ENABLE, MPU6500_ACCEL_DLPF_BW_44_HZ);
+    ok &= setAccelRange(MPU6500_ACCEL_FS_2G);
+    ok &= enableGyro(MPU6500_SENSOR_DISABLE);
+    ok &= enableTempSense(MPU6500_SENSOR_DISABLE);
+    return ok;
 }
 
 bool MPU6500::sleep(){

@@ -9,16 +9,7 @@
 #define SCL_PIN 22 // I2C SCL pin
 #define I2C_FREQ 100000 // I2C clock speed, fast mode (HZ)
 
-// QMC5883L global declarations
-#define QMC5883L_ADDR 0x2C // I2C address of QMC5883L
-#define QMC5883L_CALIBRATION_TIME 5000 
-#define QMC5883L_OUTPUT_RATE 10 // Data output in Hz
-#define QMC5883L_OVERSAMPLE_RATE 8 // Oversample rate
-#define QMC5883L_DOWNSAMPLE_RATE 8 // Downsample rate
-#define QMC5883L_RANGE 2 // +/- range in Gauss
-
-// Create QMC5883L object
-QMC5883L qmc5883l(QMC5883L_ADDR);
+QMC5883L qmc5883l;
 
 // Struct for storing sensor information
 Vec3 mag;
@@ -44,11 +35,11 @@ void setup() {
   // Configure qmc5883l settings
   qmc5883lSuccess &= qmc5883l.resetRegisters();
   qmc5883lSuccess &= qmc5883l.setMode(QMC5883L::MODE_NORMAL);
-  qmc5883lSuccess &= qmc5883l.setOutputRate(QMC5883L_OUTPUT_RATE);
-  qmc5883lSuccess &= qmc5883l.setOverSampleRate(QMC5883L_OVERSAMPLE_RATE);
-  qmc5883lSuccess &= qmc5883l.setDownSampleRate(QMC5883L_DOWNSAMPLE_RATE);
+  qmc5883lSuccess &= qmc5883l.setOutputRate(QMC5883L_OUTPUT_ODR_10_HZ);
+  qmc5883lSuccess &= qmc5883l.setOverSampleRate(QMC5883L_OVERSAMPLE_RATE_8);
+  qmc5883lSuccess &= qmc5883l.setDownSampleRate(QMC5883L_DOWNSAMPLE_RATE_8);
   qmc5883lSuccess &= qmc5883l.setSetResetMode(QMC5883L::SET_ON);
-  qmc5883lSuccess &= qmc5883l.setRange(QMC5883L_RANGE);
+  qmc5883lSuccess &= qmc5883l.setRange(QMC5883L_RANGE_2_GAUSS);
   setupSuccess &= qmc5883lSuccess;
   if(!qmc5883lSuccess){
     Serial.println("QMC5883L failed to initialize!");
@@ -57,7 +48,7 @@ void setup() {
   // Calibrate qmc5883l
   // Comment out if calibration isn't necessary
   if(qmc5883lSuccess){
-    qmc5883l.calibrate(QMC5883L_CALIBRATION_TIME);
+    qmc5883l.calibrate();
   }
 }
 

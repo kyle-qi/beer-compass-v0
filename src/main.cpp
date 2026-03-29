@@ -26,28 +26,9 @@ Adafruit_SSD1306 ssd1306(SSD1306_SCREEN_WIDTH, SSD1306_SCREEN_HEIGHT, &Wire, SSD
 #define SCL_PIN 22 // I2C SCL pin
 #define I2C_FREQ 100000 // I2C clock speed, standard mode (HZ)
 
-// QMC5883L global declarations
-#define QMC5883L_ADDR 0x2C // I2C address of QMC5883L
-#define QMC5883L_CALIBRATION_TIME 5000 
-#define QMC5883L_OUTPUT_RATE 10 // Data output in Hz
-#define QMC5883L_OVERSAMPLE_RATE 8 // Oversample rate
-#define QMC5883L_DOWNSAMPLE_RATE 8 // Downsample rate
-#define QMC5883L_RANGE 8 // +/- range in Gauss
-
-// Create QMC5883L object
-QMC5883L qmc5883l(QMC5883L_ADDR);
-
-// MPU6500 global declarations
-#define MPU6500_ADDR 0x68 // I2C address of MPU6500
-#define MPU6500_SAMPLE_RATE_DIVIDER 9 // Eq. to 100 Hz output rate
-#define MPU6500_FIFO_MODE 0 // Overwrite old data
-#define MPU6500_ACCEL_BANDWIDTH 44 // Accel LPF cutoff frequency
-#define MPU6500_ACCEL_RANGE 2 // +/- range in m/s^2
-#define MPU6500_TEMP_DISABLE 0 // Disable temp sensor
-#define MPU6500_GYRO_DISABLE 0 // Disable gyro sensor
-
-// Create MPU6500 object
-MPU6500 mpu6500(MPU6500_ADDR);
+// Create QMC5883L / MPU6500 (defaults: I2C addresses and register options in library headers)
+QMC5883L qmc5883l;
+MPU6500 mpu6500;
 
 // Neo6M global declarations
 #define NEO6M_SERIAL_PORT Serial1
@@ -89,28 +70,14 @@ void setup() {
   // Scan for I2C devices (if necessary)
   // i2cScan();
 
-  // Configure qmc5883l settings
-  qmc5883lSuccess &= qmc5883l.resetRegisters();
-  qmc5883lSuccess &= qmc5883l.setMode(QMC5883L::MODE_CONTINUOUS);
-  qmc5883lSuccess &= qmc5883l.setOutputRate(QMC5883L_OUTPUT_RATE);
-  qmc5883lSuccess &= qmc5883l.setOverSampleRate(QMC5883L_OVERSAMPLE_RATE);
-  qmc5883lSuccess &= qmc5883l.setDownSampleRate(QMC5883L_DOWNSAMPLE_RATE);
-  qmc5883lSuccess &= qmc5883l.setSetResetMode(QMC5883L::SET_ON);
-  qmc5883lSuccess &= qmc5883l.setRange(QMC5883L_RANGE);
+  // Configure qmc5883l / mpu6500 (macros and steps live in library headers / configureDefaults)
+  qmc5883lSuccess &= qmc5883l.configureDefaults();
   setupSuccess &= qmc5883lSuccess;
   if(!qmc5883lSuccess){
     Serial.println("QMC5883L failed to initialize!");
   }
 
-  // Configure mpu6500 settings
-  mpu6500Success &= mpu6500.resetRegisters();
-  mpu6500Success &= mpu6500.setSampleRateDivider(MPU6500_SAMPLE_RATE_DIVIDER);
-  mpu6500Success &= mpu6500.setFIFOMode(MPU6500_FIFO_MODE);
-  mpu6500Success &= mpu6500.setFSync(MPU6500::EXT_SOURCE_DISABLE);
-  mpu6500Success &= mpu6500.setAccelLPF(1, MPU6500_ACCEL_BANDWIDTH);
-  mpu6500Success &= mpu6500.setAccelRange(MPU6500_ACCEL_RANGE);
-  mpu6500Success &= mpu6500.enableGyro(MPU6500_GYRO_DISABLE);
-  mpu6500Success &= mpu6500.enableTempSense(MPU6500_TEMP_DISABLE);
+  mpu6500Success &= mpu6500.configureDefaults();
   setupSuccess &= mpu6500Success;
   if(!mpu6500Success){
     Serial.println("MPU6500 failed to initialize!");
@@ -119,7 +86,7 @@ void setup() {
   // Calibrate qmc5883l
   // Comment out if calibration isn't necessary
   if(qmc5883lSuccess){
-    qmc5883l.calibrate(QMC5883L_CALIBRATION_TIME);
+    qmc5883l.calibrate();
   }
 }
 
