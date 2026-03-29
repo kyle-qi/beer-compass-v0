@@ -25,6 +25,6 @@ const Location LOCATIONS[] = {
 /**
  * @brief The number of location objects in the LOCATIONS array.
  */
-const int nLocations = sizeof(LOCATIONS)/sizeof(LOCATIONS[0]);
+constexpr size_t nLocations = sizeof(LOCATIONS) / sizeof(LOCATIONS[0]);
 
 #endif

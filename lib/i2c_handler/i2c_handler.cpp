@@ -4,23 +4,23 @@
 
 bool i2cScan(){
   Serial.print("Scanning for I2C devices");
-  for (int i = 0; i < 3; i++){
+  for (uint8_t i = 0; i < 3; ++i){
     delay(500);
     Serial.print(".");
   }
   delay(500);
   Serial.println();
 
-  bool deviceDetected = 0;
-  for (int addr = 1; addr < 127; addr++){
+  bool deviceDetected = false;
+  for (uint8_t addr = 1; addr < 127; ++addr){
     Wire.beginTransmission(addr);
     if (Wire.endTransmission() == 0){
       Serial.print("Found device at address 0x");
       Serial.println(addr, HEX);
-      deviceDetected = 1;
-      }
+      deviceDetected = true;
     }
-    return deviceDetected;
+  }
+  return deviceDetected;
 }
 
 bool i2cInit(int sdaPin, int sclPin, uint32_t frequency){
@@ -70,16 +70,5 @@ uint16_t i2cReadTwo(uint8_t addr, uint8_t lsbReg, uint8_t msbReg){
 
     return ((uint16_t)msb << 8) | lsb;  // combine into unsigned 16-bit
 }
-
-// uint16_t i2cReadTwo(uint8_t addr, uint8_t lsbReg, uint8_t msbReg){
-//   Wire.beginTransmission(addr);
-//   Wire.write(lsbReg);
-//   Wire.endTransmission();
-//   Wire.requestFrom(addr, (uint8_t)2);
-//   if(Wire.available() < 2) return 0;
-//   uint8_t lsb = Wire.read();
-//   uint8_t msb = Wire.read();
-//   return (int16_t)((msb << 8) | lsb);
-// }
 
 

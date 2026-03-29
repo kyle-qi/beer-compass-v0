@@ -2,6 +2,7 @@
 #define NAVIGATION_H
 
 #include <Arduino.h>
+#include <cstddef>
 
 #ifndef DEG_TO_RAD
 #define DEG_TO_RAD 0.017453292519943295769236907684886
@@ -27,7 +28,7 @@ struct Location {
  * @param nLocations The number of locations in the locations array.
  * @return the Location struct containing the closest latitutde/longitutde coordinates.
  */
-Location closestTarget(const Location myLocation, const Location locations[], int nLocations);
+Location closestTarget(const Location myLocation, const Location locations[], size_t nLocations);
 
 /**
  * @brief Calculates the relative heading of the user to a target location.

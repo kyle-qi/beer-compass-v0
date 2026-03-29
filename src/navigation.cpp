@@ -1,7 +1,7 @@
 #include "navigation.h"
 #include "utils.h"
 
-Location closestTarget(const Location myLocation, const Location locations[], int nLocations){
+Location closestTarget(const Location myLocation, const Location locations[], size_t nLocations){
     // Edge case handling
     if(nLocations == 1){
         return locations[0];
@@ -10,10 +10,10 @@ Location closestTarget(const Location myLocation, const Location locations[], in
         return myLocation;
     }
 
-    int nearestIndex = 0;
+    size_t nearestIndex = 0;
     float minDistanceSq = MAXFLOAT;
 
-    for (int i = 0; i < nLocations; i++){
+    for (size_t i = 0; i < nLocations; ++i){
         float dx = myLocation.lon - locations[i].lon;
         float dy = myLocation.lat - locations[i].lat;
         float distanceSq = dx * dx + dy * dy;

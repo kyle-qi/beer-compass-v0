@@ -34,7 +34,7 @@ bool Neo6M::read() {
 
             if (strncmp(buffer, "$GPGGA", 6) == 0) {
                 char *token;
-                int fieldIndex = 0;
+                uint8_t fieldIndex = 0;
 
                 token = strtok(buffer, ",");
                 while (token != NULL) {
@@ -66,9 +66,11 @@ bool Neo6M::read() {
                         case 5:
                             if (token[0] == 'W') this->longitude = -this->longitude;
                             break;
-                        case 7:
-                            this->numSatelites = atoi(token);
+                        case 7: {
+                            int n = atoi(token);
+                            this->numSatelites = (n < 0) ? 0 : (n > 255) ? 255 : static_cast<uint8_t>(n);
                             break;
+                        }
                         case 8:
                             this->horizontalDilution = atof(token);
                             break;

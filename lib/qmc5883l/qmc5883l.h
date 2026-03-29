@@ -174,7 +174,7 @@ class QMC5883L{
      * 
      * @param calibrationTime Duration of no-change before ending calibration in ms (default @ref QMC5883L_CALIBRATION_IDLE_MS_DEFAULT).
      */
-    void calibrate(int calibrationTime = QMC5883L_CALIBRATION_IDLE_MS_DEFAULT);
+    void calibrate(uint32_t calibrationTime = QMC5883L_CALIBRATION_IDLE_MS_DEFAULT);
 
     /**
      * @brief Manually set magnetometer's maximum/minimum readings for calibration.

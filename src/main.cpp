@@ -98,7 +98,7 @@ void loop() {
   }
 
   // Get magnetometer readings
-  if(qmc5883l.isDRDY() == 1){
+  if (qmc5883l.isDRDY()){
     qmc5883l.read();
     mag.x = qmc5883l.getX();
     mag.y = qmc5883l.getY();
@@ -106,7 +106,7 @@ void loop() {
   }
 
   // Get accelerometer readings
-  if(mpu6500.isDRDY() == 1){
+  if (mpu6500.isDRDY()){
     mpu6500.readAccel();
     accel.x = mpu6500.getAccelX();
     accel.y = mpu6500.getAccelY();

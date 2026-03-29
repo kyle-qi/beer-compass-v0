@@ -151,15 +151,15 @@ bool MPU6500::isDRDY(){
 }
 
 int16_t MPU6500::readGyroX(){
-    return readSensor(GYRO_XOUT_H, GYRO_XOUT_L, this->xGyroRaw, this->xGyro, 0);
+    return readSensor(GYRO_XOUT_H, GYRO_XOUT_L, this->xGyroRaw, this->xGyro, SensorChannel::Gyro);
 }
 
 int16_t MPU6500::readGyroY(){
-    return readSensor(GYRO_YOUT_H, GYRO_YOUT_L, this->yGyroRaw, this->yGyro, 0);
+    return readSensor(GYRO_YOUT_H, GYRO_YOUT_L, this->yGyroRaw, this->yGyro, SensorChannel::Gyro);
 }
 
 int16_t MPU6500::readGyroZ(){
-    return readSensor(GYRO_ZOUT_H, GYRO_ZOUT_L, this->zGyroRaw, this->zGyro, 0);
+    return readSensor(GYRO_ZOUT_H, GYRO_ZOUT_L, this->zGyroRaw, this->zGyro, SensorChannel::Gyro);
 }
 
 void MPU6500::readGyro(){
@@ -169,15 +169,15 @@ void MPU6500::readGyro(){
 }
 
 int16_t MPU6500::readAccelX(){
-    return readSensor(ACCEL_XOUT_H, ACCEL_XOUT_L, this->xAccelRaw, this->xAccel, 1);
+    return readSensor(ACCEL_XOUT_H, ACCEL_XOUT_L, this->xAccelRaw, this->xAccel, SensorChannel::Accel);
 }
 
 int16_t MPU6500::readAccelY(){
-    return readSensor(ACCEL_YOUT_H, ACCEL_YOUT_L, this->yAccelRaw, this->yAccel, 1);
+    return readSensor(ACCEL_YOUT_H, ACCEL_YOUT_L, this->yAccelRaw, this->yAccel, SensorChannel::Accel);
 }
 
 int16_t MPU6500::readAccelZ(){
-    return readSensor(ACCEL_ZOUT_H, ACCEL_ZOUT_L, this->zAccelRaw, this->zAccel, 1);
+    return readSensor(ACCEL_ZOUT_H, ACCEL_ZOUT_L, this->zAccelRaw, this->zAccel, SensorChannel::Accel);
 }
 
 void MPU6500::readAccel(){
@@ -187,7 +187,7 @@ void MPU6500::readAccel(){
 }
 
 int16_t MPU6500::readTemp(){
-    return readSensor(TEMP_OUT_H, TEMP_OUT_L, this->tempRaw, this->temp, 2);
+    return readSensor(TEMP_OUT_H, TEMP_OUT_L, this->tempRaw, this->temp, SensorChannel::Temp);
     // Convert the reading into degrees Celsius. Reference the data sheet for equation
     // TODO: Define tempOffset and tempSensitivity
     // return (reading - tempOffset)/tempSensitivity + 21;
@@ -270,19 +270,19 @@ uint8_t MPU6500::whoAmI(){
     return i2cRead(this->address, WHO_AM_I);
 }
 
-int16_t MPU6500::readSensor(uint8_t msbReg, uint8_t lsbReg, int16_t& rawStorage, float& storage, uint8_t sensorType){
+int16_t MPU6500::readSensor(uint8_t msbReg, uint8_t lsbReg, int16_t& rawStorage, float& storage, SensorChannel channel){
     int16_t val = (int16_t)i2cReadTwo(this->address, lsbReg, msbReg);
     rawStorage = val;
-    storage = (float)val;
-    if(sensorType = 0){
-        storage *= lsbResGyro;
-    } else if (sensorType = 1){
-        storage *= lsbResAccel;
-    } else if (sensorType = 2){
-        storage *= 1; // TODO: Figure this out
-    } else {
-        // If this else condition ever enters then I'm extremely stupid
-        Serial.println("ERROR: MPU6500 readSensor has an invalid sensorType parameter!");
+    storage = static_cast<float>(val);
+    switch (channel) {
+        case SensorChannel::Gyro:
+            storage *= lsbResGyro;
+            break;
+        case SensorChannel::Accel:
+            storage *= lsbResAccel;
+            break;
+        case SensorChannel::Temp:
+            break;
     }
     return val;
 }

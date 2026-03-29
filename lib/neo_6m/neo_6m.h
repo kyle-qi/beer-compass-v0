@@ -99,7 +99,7 @@ class Neo6M {
      * 
      * @return The most recent number of satelites detected/used.
      */
-    float getNumSatelites() {return this->numSatelites;}
+    uint8_t getNumSatelites() { return this->numSatelites; }
 
     // TODO: Create Doxygen
     /**

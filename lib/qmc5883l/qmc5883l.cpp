@@ -126,7 +126,7 @@ bool QMC5883L::isOVFL(){
     return (i2cRead(this->address, STATUS_REG) & 0b10) != 0;
 }
 
-void QMC5883L::calibrate(int calibrationTime){
+void QMC5883L::calibrate(uint32_t calibrationTime){
     // Stores the max and min magnetometer reading
     int16_t minMaxReadings[3][2] = {
         {INT16_MAX, INT16_MIN},
@@ -144,7 +144,7 @@ void QMC5883L::calibrate(int calibrationTime){
         Serial.println("Keep moving compass...");
         int16_t readings[3] = {readX(), readY(), readZ()};
 
-        for (int i = 0; i < 3; i++) {
+        for (uint8_t i = 0; i < 3; ++i) {
             if (readings[i] < minMaxReadings[i][0]) {
                 minMaxReadings[i][0] = readings[i];
                 timeStamp = millis();

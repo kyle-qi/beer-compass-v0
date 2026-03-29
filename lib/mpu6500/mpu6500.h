@@ -523,15 +523,14 @@ class MPU6500{
      */
     float lsbResGyro;
 
-    // TODO: Create doxygen
-    /**
-     * @brief
-     * 
-     * @param
-     * @param 
-     * @return
-     */
-    int16_t readSensor(uint8_t msbReg, uint8_t lsbReg, int16_t& rawStorage, float& storage, uint8_t sensorType);
+    /** Selects scaling in @ref readSensor (gyro rad/s, accel m/s², temp raw). */
+    enum class SensorChannel : uint8_t {
+        Gyro = 0,
+        Accel = 1,
+        Temp = 2,
+    };
+
+    int16_t readSensor(uint8_t msbReg, uint8_t lsbReg, int16_t& rawStorage, float& storage, SensorChannel channel);
 };
 
 #endif
