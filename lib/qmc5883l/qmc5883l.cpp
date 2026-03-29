@@ -5,7 +5,7 @@
 QMC5883L::QMC5883L(uint8_t myAddress) : address(myAddress) {}
 
 bool QMC5883L::setMode(Mode mode){
-    uint8_t config = i2cRead(this->address, CTRLA_REG);
+    uint8_t config = i2cRead(this->address, QMC5883L_CTRLA_REG);
 
     // Early return if mode is already set properly
     if(readBits(config, 0b11) == static_cast<uint8_t>(mode)){
@@ -15,7 +15,7 @@ bool QMC5883L::setMode(Mode mode){
     // Mode must be set to suspend between different modes
     if (readBits(config, 0b11) != 0b00){
         config = writeBits(config, 0b00, 0b11);
-        if (!i2cWrite(this->address, CTRLA_REG, config)){
+        if (!i2cWrite(this->address, QMC5883L_CTRLA_REG, config)){
             return false;
         }
         delay(100);
@@ -23,7 +23,7 @@ bool QMC5883L::setMode(Mode mode){
 
     // Write to registers
     config = writeBits(config, static_cast<uint8_t>(mode), 0b11);
-    return i2cWrite(this->address, CTRLA_REG, config);
+    return i2cWrite(this->address, QMC5883L_CTRLA_REG, config);
 }
     
 bool QMC5883L::setOutputRate(uint8_t odr){
@@ -39,7 +39,7 @@ bool QMC5883L::setOutputRate(uint8_t odr){
     bits <<= 2;
 
     // Set output rate
-    return i2cWrite(this->address, CTRLA_REG, bits, 0b00001100);
+    return i2cWrite(this->address, QMC5883L_CTRLA_REG, bits, 0b00001100);
 }
 
 bool QMC5883L::setOverSampleRate(uint8_t osr1){
@@ -55,7 +55,7 @@ bool QMC5883L::setOverSampleRate(uint8_t osr1){
     bits <<= 4;
 
     // Set over sample rate
-    return i2cWrite(this->address, CTRLA_REG, bits, 0b00110000);
+    return i2cWrite(this->address, QMC5883L_CTRLA_REG, bits, 0b00110000);
 }
 
 bool QMC5883L::setDownSampleRate(uint8_t osr2){
@@ -71,7 +71,7 @@ bool QMC5883L::setDownSampleRate(uint8_t osr2){
     bits <<= 6;
 
     // Set down sample rate
-    return i2cWrite(this->address, CTRLA_REG, bits, 0b11000000);
+    return i2cWrite(this->address, QMC5883L_CTRLA_REG, bits, 0b11000000);
 }
 
 bool QMC5883L::setRange(uint8_t range){
@@ -88,19 +88,19 @@ bool QMC5883L::setRange(uint8_t range){
     this->lsbRes = float(range)/32768.0f;
 
     // Set range
-    return i2cWrite(this->address, CTRLB_REG, bits, 0b00001100);
+    return i2cWrite(this->address, QMC5883L_CTRLB_REG, bits, 0b00001100);
 }
 
 bool QMC5883L::setSetResetMode(SetResetMode mode){
-    return i2cWrite(this->address, CTRLB_REG, static_cast<uint8_t>(mode), 0b11);
+    return i2cWrite(this->address, QMC5883L_CTRLB_REG, static_cast<uint8_t>(mode), 0b11);
 }
 
 bool QMC5883L::resetRegisters(){
-    if(!i2cWriteBit(this->address, CTRLB_REG, 1, 7)){
+    if(!i2cWriteBit(this->address, QMC5883L_CTRLB_REG, 1, 7)){
         return false;
     }
     delay(10);
-    if(!i2cWriteBit(this->address, CTRLB_REG, 0, 7)){
+    if(!i2cWriteBit(this->address, QMC5883L_CTRLB_REG, 0, 7)){
         return false;
     }
     return true;
@@ -119,11 +119,11 @@ bool QMC5883L::configureDefaults(){
 }
 
 bool QMC5883L::isDRDY(){
-    return (i2cRead(this->address, STATUS_REG) & 0b01) != 0;
+    return (i2cRead(this->address, QMC5883L_STATUS_REG) & 0b01) != 0;
 }
 
 bool QMC5883L::isOVFL(){
-    return (i2cRead(this->address, STATUS_REG) & 0b10) != 0;
+    return (i2cRead(this->address, QMC5883L_STATUS_REG) & 0b10) != 0;
 }
 
 void QMC5883L::calibrate(uint32_t calibrationTime){
@@ -195,15 +195,15 @@ void QMC5883L::setCalibrationData(int16_t xMax, int16_t yMax, int16_t zMax, int1
 }
 
 int16_t QMC5883L::readX() {
-    return readAxis(XMSB_REG, XLSB_REG, this->xRaw, this->x, this->xGauss, this->xMax, this->xMin);
+    return readAxis(QMC5883L_XMSB_REG, QMC5883L_XLSB_REG, this->xRaw, this->x, this->xGauss, this->xMax, this->xMin);
 }
 
 int16_t QMC5883L::readY() {
-    return readAxis(YMSB_REG, YLSB_REG, this->yRaw, this->y, this->yGauss, this->yMax, this->yMin);
+    return readAxis(QMC5883L_YMSB_REG, QMC5883L_YLSB_REG, this->yRaw, this->y, this->yGauss, this->yMax, this->yMin);
 }
 
 int16_t QMC5883L::readZ() {
-    return readAxis(ZMSB_REG, ZLSB_REG, this->zRaw, this->z, this->zGauss, this->zMax, this->zMin);
+    return readAxis(QMC5883L_ZMSB_REG, QMC5883L_ZLSB_REG, this->zRaw, this->z, this->zGauss, this->zMax, this->zMin);
 }
 
 void QMC5883L::read(){

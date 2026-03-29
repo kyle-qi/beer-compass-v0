@@ -2,64 +2,7 @@
 #define QMC5883L_H
 
 #include <Arduino.h>
-
-/** I2C address with ADDR pin low (override before including this header if needed). */
-#ifndef QMC5883L_I2C_ADDR_PIN_LOW
-#define QMC5883L_I2C_ADDR_PIN_LOW 0x2C
-#endif
-
-/** @name setOutputRate — valid ODR (Hz) */
-/// @{
-#define QMC5883L_OUTPUT_ODR_10_HZ  10
-#define QMC5883L_OUTPUT_ODR_50_HZ  50
-#define QMC5883L_OUTPUT_ODR_100_HZ 100
-#define QMC5883L_OUTPUT_ODR_200_HZ 200
-/// @}
-
-/** @name setOverSampleRate — valid ratios */
-/// @{
-#define QMC5883L_OVERSAMPLE_RATE_1 1
-#define QMC5883L_OVERSAMPLE_RATE_2 2
-#define QMC5883L_OVERSAMPLE_RATE_4 4
-#define QMC5883L_OVERSAMPLE_RATE_8 8
-/// @}
-
-/** @name setDownSampleRate — valid ratios */
-/// @{
-#define QMC5883L_DOWNSAMPLE_RATE_1 1
-#define QMC5883L_DOWNSAMPLE_RATE_2 2
-#define QMC5883L_DOWNSAMPLE_RATE_4 4
-#define QMC5883L_DOWNSAMPLE_RATE_8 8
-/// @}
-
-/** @name setRange — full scale (Gauss) */
-/// @{
-#define QMC5883L_RANGE_2_GAUSS  2
-#define QMC5883L_RANGE_8_GAUSS  8
-#define QMC5883L_RANGE_12_GAUSS 12
-#define QMC5883L_RANGE_30_GAUSS 30
-/// @}
-
-/** Default idle time (ms) with no min/max update before @ref calibrate ends. */
-#ifndef QMC5883L_CALIBRATION_IDLE_MS_DEFAULT
-#define QMC5883L_CALIBRATION_IDLE_MS_DEFAULT 5000
-#endif
-
-// Magnetometer registers
-#define XLSB_REG 0x01
-#define XMSB_REG 0x02
-#define YLSB_REG 0x03
-#define YMSB_REG 0x04
-#define ZLSB_REG 0x05
-#define ZMSB_REG 0x06
-#define STATUS_REG 0x09
-#define CTRLA_REG 0x0A
-#define CTRLB_REG 0x0B
-
-// Multiply to convert radians to degrees
-#ifndef RAD_TO_DEG
-#define RAD_TO_DEG 57.295779513082320876798154814105
-#endif
+#include "config/qmc5883l_defs.h"
 
 class QMC5883L{
     public:

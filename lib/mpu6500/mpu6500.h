@@ -2,73 +2,7 @@
 #define MPU6500_H
 
 #include <Arduino.h>
-#include "mpu6500_registers.h"
-
-#ifndef GRAVITY
-#define GRAVITY 9.10665
-#endif
-
-/** I2C address with AD0 low (override before including this header if needed). */
-#ifndef MPU6500_I2C_ADDR_AD0_LOW
-#define MPU6500_I2C_ADDR_AD0_LOW 0x68
-#endif
-
-/** @name setSampleRateDivider — example values (register SMPLRT_DIV; internal rate 1 kHz → ~100 Hz data) */
-/// @{
-#define MPU6500_SMPLRT_DIV_9 9
-/// @}
-
-/** @name setFIFOMode — @c stopWhenFull argument */
-/// @{
-#define MPU6500_FIFO_OVERWRITE_OLDEST false
-#define MPU6500_FIFO_STOP_WHEN_FULL   true
-/// @}
-
-/** @name setAccelLPF — valid bandwidth (Hz) when LPF is on */
-/// @{
-#define MPU6500_ACCEL_DLPF_BW_460_HZ 460
-#define MPU6500_ACCEL_DLPF_BW_184_HZ 184
-#define MPU6500_ACCEL_DLPF_BW_92_HZ  92
-#define MPU6500_ACCEL_DLPF_BW_44_HZ  44
-#define MPU6500_ACCEL_DLPF_BW_41_HZ  41
-#define MPU6500_ACCEL_DLPF_BW_20_HZ  20
-#define MPU6500_ACCEL_DLPF_BW_10_HZ  10
-#define MPU6500_ACCEL_DLPF_BW_5_HZ   5
-/// @}
-
-/** @name setAccelRange — full scale (g) */
-/// @{
-#define MPU6500_ACCEL_FS_2G  2
-#define MPU6500_ACCEL_FS_4G  4
-#define MPU6500_ACCEL_FS_8G  8
-#define MPU6500_ACCEL_FS_16G 16
-/// @}
-
-/** @name setGyroRange — full scale (dps) */
-/// @{
-#define MPU6500_GYRO_FS_250DPS  250
-#define MPU6500_GYRO_FS_500DPS  500
-#define MPU6500_GYRO_FS_1000DPS 1000
-#define MPU6500_GYRO_FS_2000DPS 2000
-/// @}
-
-/** @name setGyroLPF — valid bandwidth (Hz) when LPF is on */
-/// @{
-#define MPU6500_GYRO_DLPF_BW_250_HZ  250
-#define MPU6500_GYRO_DLPF_BW_184_HZ  184
-#define MPU6500_GYRO_DLPF_BW_92_HZ   92
-#define MPU6500_GYRO_DLPF_BW_41_HZ   41
-#define MPU6500_GYRO_DLPF_BW_20_HZ   20
-#define MPU6500_GYRO_DLPF_BW_10_HZ   10
-#define MPU6500_GYRO_DLPF_BW_5_HZ    5
-#define MPU6500_GYRO_DLPF_BW_3600_HZ 3600
-/// @}
-
-/** @name enableGyro, enableTempSense, LPF enables — @c isEnable / @c isOn arguments */
-/// @{
-#define MPU6500_SENSOR_ENABLE  true
-#define MPU6500_SENSOR_DISABLE false
-/// @}
+#include "config/mpu6500_defs.h"
 
 class MPU6500{
     public:
