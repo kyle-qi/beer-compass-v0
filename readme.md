@@ -1,52 +1,92 @@
 # Beer Compass
 
-A compass built with the Arduino framework that always points to the nearest liquor store. This repository contains the firmware for version 0 of the project, which uses breakout boards and breadboards. Version 1 will feature a custom PCB design, but the firmware will remain largely the same since the same ICs will be used. (At least, that's the plan at the time of writing.)
+A compass built with the Arduino framework that always points to the nearest
+liquor store. This repository contains the firmware for version 0 of the
+project, which uses breakout boards and breadboards. Version 1 will feature a
+custom PCB design, but the firmware will remain largely the same since the same
+ICs will be used.
 
-# Project Organization
+## Repository layout
 
-This version is developed on an ESP32 using the Arduino framework. To enhance portability, the code is structured to separate hardware interfacing from the high level logic. Wrapper libraries handle I2C, SPI, and Serial communications. The IC libraries and main application avoid direct hardware calls, so if the project moves to another language or framework, only the hardware wrappers need modification, keeping the rest of the code untouched.
-
-## Library Structure
-
-```mermaid
-
-flowchart LR
-
-%% Main non-hardware libraries
-main[Main Application] --> utils[Utility Library]
-main --> locations[Liquor Store Locations]
-
-%% Main IC libraries
-main --> mpu6500[MPU6500 Library]
-main --> qmc5883l[QMC5883L Library]
-main --> neo6m[Neo-6M Library]
-
-%% Main hardware interfacing libraries
-main --> serial(Serial Handler)
-main --> i2c(I2C Handler)
-
-%% MPU6500 libraries
-mpu6500 --> i2c
-
-%% QMC5883L libraries
-qmc5883l --> i2c
-
-%% Neo-6M libraries
-neo6m --> serial
-
-%% I2C libraries
-i2c --> wire([Wire.h])
-i2c --> bitops[Bit Ops Library]
-
-%% Serial libraries
+This project is part of a small embedded monorepo ecosystem. Two sibling
+repositories must be cloned alongside this one:
 
 ```
+Projects/
+├── embedded-libraries/   Hardware drivers (QMC5883L, MPU6500, Neo6M, i2c_handler)
+├── 9-dof/                Sensor fusion algorithms (pitch, roll, yaw, tilt-compensated heading)
+└── beer-compass-v0/      ← this repo — application logic only
+```
 
-<ul>
-    <li> Rectangles denote logic libraries. Portable with minimal modification. </li>
-    <li> Rounded rectangles denote hardware wrappers. Requires heavy modification when changing frameworks. </li>
-    <li>    Pill shapes represent libraries that will have to be replaced entirely if shifting frameworks,
-            (i.e., Arduino libraries.) For example, moving to STM32 will replace these with the HAL functions.</li>
-    <li>    Arduino.h is omitted from the flowchart since it is called in virtually every applcation.
-            It's equivalent to a platform's standard library. </li>
-</ul>
+`platformio.ini` points at both sibling repos via `lib_extra_dirs`. Clone all
+three into the same parent directory and `pio run` will resolve every dependency
+automatically.
+
+## Getting started
+
+```bash
+# Clone all three repos side by side
+git clone <url>/embedded-libraries
+git clone <url>/9-dof
+git clone <url>/beer-compass-v0
+
+cd beer-compass-v0
+pio run
+```
+
+## Project architecture
+
+The codebase is split into three responsibility layers:
+
+| Layer | Where it lives |
+|---|---|
+| Hardware drivers — register maps, I2C/UART comms, raw data conversion | `embedded-libraries` repo |
+| Sensor fusion — pitch, roll, yaw, tilt-compensated azimuth | `9-dof` repo |
+| Application — UI, navigation, locations, sensor wiring | this repo (`src/`, `include/`) |
+
+### Dependency graph
+
+```mermaid
+flowchart LR
+
+%% Application layer
+main[main.cpp] --> display[display]
+main --> navigation[navigation]
+main --> locations[my_locations]
+main --> utils[utils]
+
+%% Sensor fusion layer
+main --> ninedof[nine_dof\n9-dof repo]
+
+%% Hardware driver layer — sensors
+main --> qmc5883l[QMC5883L\nembedded-libraries]
+main --> mpu6500[MPU6500\nembedded-libraries]
+main --> neo6m[Neo6M\nembedded-libraries]
+
+%% Hardware driver layer — common
+main --> i2c[i2c_handler\nembedded-libraries]
+qmc5883l --> i2c
+mpu6500 --> i2c
+
+%% Platform primitives
+i2c --> wire([Wire.h])
+neo6m --> serial([HardwareSerial])
+
+%% Adafruit display stack
+main --> ssd1306([Adafruit SSD1306])
+ssd1306 --> gfx([Adafruit GFX])
+```
+
+**Shape legend**
+- Rectangle — portable logic library (minimal changes when changing targets)
+- Rounded rectangle / pill — platform wrapper (requires modification when changing frameworks)
+
+## Hardware
+
+| Component | Interface | Notes |
+|---|---|---|
+| ESP32 DevKit V1 | — | MCU |
+| QMC5883L | I2C (SDA 21, SCL 22) | Magnetometer |
+| MPU6500 | I2C (SDA 21, SCL 22) | Accelerometer / gyroscope |
+| u-blox NEO-6M | UART (RX 16, TX 17) | GPS |
+| SSD1306 128×64 OLED | I2C (SDA 21, SCL 22) | Display |

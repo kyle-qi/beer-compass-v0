@@ -7,7 +7,7 @@
 #include "qmc5883l.h"
 #include "mpu6500.h"
 #include "neo_6m.h"
-#include "imu.h"
+#include "nine_dof.h"
 #include "navigation.h"
 #include "my_locations.h"
 #include "display.h"
@@ -114,7 +114,7 @@ void loop() {
   }
 
   // Get tilt-compensated azimuth
-  float azimuth = true_azimuth(accel.x, accel.y, accel.z, mag.x, mag.y, mag.z);
+  float azimuth = nine_dof::true_azimuth(accel.x, accel.y, accel.z, mag.x, mag.y, mag.z);
 
   Serial.println("START READING");
 
